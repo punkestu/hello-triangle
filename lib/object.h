@@ -8,6 +8,7 @@ class Object
 private:
       unsigned int VAO;
       unsigned int VBO;
+      unsigned int EBO;
 
       unsigned int shader;
 
@@ -15,6 +16,7 @@ public:
       Object();
       void CreateVBO(float *vertices, GLsizeiptr size);
       void AddVBAttrib(GLuint id, GLint size, GLsizei stride, const void *offset);
+      void CreateEBO(unsigned int *indices, GLsizeiptr size);
       void AttachShader(unsigned int shader);
       void Bind();
       void Unbind();

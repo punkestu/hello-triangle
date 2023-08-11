@@ -5,6 +5,7 @@ Object::Object()
 {
       glGenVertexArrays(1, &VAO);
       glGenBuffers(1, &VBO);
+      glGenBuffers(1, &EBO);
 }
 
 void Object::CreateVBO(float *vertices, GLsizeiptr size)
@@ -21,6 +22,13 @@ void Object::AddVBAttrib(GLuint id, GLint size, GLsizei stride, const void *offs
       glBindBuffer(GL_ARRAY_BUFFER, VBO);
       glVertexAttribPointer(id, size, GL_FLOAT, GL_FALSE, stride, offset);
       glEnableVertexAttribArray(id);
+      glBindVertexArray(0);
+}
+
+void Object::CreateEBO(unsigned int *indices, GLsizeiptr size) {
+      glBindVertexArray(VAO);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
       glBindVertexArray(0);
 }
 

@@ -29,23 +29,21 @@ int main()
       glfwMakeContextCurrent(window);
 
       float vertices[] = {
-          -0.5f,
-          -0.5f,
-          0.0f,
-          0.0f,
-          0.5f,
-          -0.5f,
-          0.0f,
-          0.0f,
-          0.0f,
-          0.5f,
-          0.0f,
-          0.0f,
+          -0.5f, -0.5f, // 0
+          0.5f, -0.5f,  // 1
+          0.5f, 0.5f,   // 2
+          -0.5f, 0.5f,  // 3
+      };
+
+      unsigned int indices[] = {
+          0, 1, 2, // 1
+          0, 3, 2, // 2
       };
 
       Object *o = new Object();
       o->CreateVBO(vertices, sizeof(vertices));
-      o->AddVBAttrib(0, 3, 4 * sizeof(float), (void *)0);
+      o->AddVBAttrib(0, 2, 2 * sizeof(float), (void *)0);
+      o->CreateEBO(indices, sizeof(indices));
 
       Pipeline builder;
       builder.reset();
@@ -68,7 +66,7 @@ int main()
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             o->Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
