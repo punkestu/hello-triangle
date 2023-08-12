@@ -72,15 +72,24 @@ int main()
       builder.AttachFragmentShader("../shaders/fragment.frag");
 
       o->AttachShader(builder.Build());
+      
       GLint ratioPtr = glGetUniformLocation(o->GetShader(), "ratio");
       glUniform1f(ratioPtr, ratio);
-      glm::vec3 rotation = glm::vec3(0.f, 1.f, 0.f);
-      GLint rotationPtr = glGetUniformLocation(o->GetShader(), "rotateAx");
-      glUniform3f(rotationPtr, rotation.x, rotation.y, rotation.z);
-      float rotationAngle = 45.f;
-      GLint anglePtr = glGetUniformLocation(o->GetShader(), "angle");
-      glm::vec3 pos = glm::vec3(0.f, 0.f, -1.f);
+
+      GLint scalePtr = glGetUniformLocation(o->GetShader(), "scales");
+      glm::vec3 scale = glm::vec3(0.5f,0.5f,0.5f);
+      glUniform3f(scalePtr, scale.x, scale.y, scale.z);
+      
+      GLint rotationPtr = glGetUniformLocation(o->GetShader(), "rotation");
+      glm::vec3 rotation = glm::vec3(0.f, 45.f, 0.f);
+      glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
+      
+      GLint transformPtr = glGetUniformLocation(o->GetShader(), "transforms");
+      glm::vec3 transform = glm::vec3(1.f,0.f,0.f);
+      glUniform3f(transformPtr, transform.x, transform.y, transform.z);
+      
       GLint cameraPtr = glGetUniformLocation(o->GetShader(), "camera");
+      glm::vec3 pos = glm::vec3(0.f, 0.f, 0.f);
       glUniform3f(cameraPtr, pos.x, pos.y, pos.z);
 
       glEnable(GL_DEPTH_TEST);
@@ -89,10 +98,11 @@ int main()
       /* Loop until the user closes the window */
       while (!glfwWindowShouldClose(window))
       {
-
-            glUniform1f(anglePtr, glm::radians(rotationAngle));
-            glUniform3f(cameraPtr, pos.x, pos.y, pos.z);
-            rotationAngle++;
+            glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
+            rotation.y++;
+            // glUniform3f(transformPtr, transform.x, transform.y, transform.z);
+            // transform.x+=0f;
+            // glUniform3f(cameraPtr, pos.x, pos.y, pos.z);
             // pos.z -= 0.01f;
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
