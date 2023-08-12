@@ -71,18 +71,20 @@ mat4 transform()
 mat4 projection() {
       float n = -1;
       float f = 1;
+      float r = 1;
+      float t = 1;
       return mat4(
-            n, 0, 0, 0,
-            0, n, 0, 0,
+            n/r, 0, 0, 0,
+            0, n/t, 0, 0,
             0, 0, 1, 0,
-            0, 0, 0, 1
+            0, 0, -1, 0
       );
 }
 
 void main() {
       vec4 localPos = vec4(vPos, 1.0) * scale() * rotate() * transform();
-      vec4 worldPos =  localPos;
-      gl_Position = vec4(worldPos.x * ratio, worldPos.y, worldPos.zw);
+      vec4 worldPos = (localPos - vec4(camera, 0)) * projection();
+      gl_Position = vec4((worldPos.x * ratio)/worldPos.w, worldPos.y/worldPos.w, worldPos.z, 1.0);
       fColor = vColor;
       fPos = localPos.xyz;
 }
