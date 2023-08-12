@@ -31,12 +31,20 @@ void getShaderCompileError(unsigned int shader, GLenum type)
 
 Pipeline::Pipeline()
 {
-      shaderProgram = glCreateProgram();
+      vertex = 0;
+      fragment = 0;
 }
 
 void Pipeline::reset()
 {
-      shaderProgram = glCreateProgram();
+      if (vertex > 0)
+      {
+            glDeleteShader(vertex);
+      }
+      if (fragment > 0)
+      {
+            glDeleteShader(fragment);
+      }
       vertex = 0;
       fragment = 0;
 }
@@ -63,10 +71,14 @@ void Pipeline::AttachFragmentShader(std::string path)
 
 unsigned int Pipeline::Build()
 {
+      unsigned int shaderProgram = glCreateProgram();
       glAttachShader(shaderProgram, vertex);
       glAttachShader(shaderProgram, fragment);
       glLinkProgram(shaderProgram);
-      glDeleteShader(vertex);
-      glDeleteShader(fragment);
       return shaderProgram;
+}
+
+Pipeline::~Pipeline()
+{
+      this->reset();
 }

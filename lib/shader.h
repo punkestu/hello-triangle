@@ -19,6 +19,7 @@ public:
       void AttachVertexShader(std::string path);
       void AttachFragmentShader(std::string path);
       unsigned int Build();
+      ~Pipeline();
 };
 
 #endif
