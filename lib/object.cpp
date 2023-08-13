@@ -14,6 +14,9 @@ Object::Object()
       vbRecId = 0;
       vbRecSz = 0;
       ebCount = 0;
+
+      pos = rotation = {0, 0, 0};
+      scale = {1, 1, 1};
 }
 
 void Object::Init(const char *objPath)
@@ -25,31 +28,27 @@ void Object::Init(const char *objPath)
       unsigned int i = 0;
       while (std::getline(file, buff))
       {
-            std::stringstream ss(buff);
-            std::string c;
-            std::getline(ss, c, ' ');
-            if (c == "v")
+            std::istringstream line(buff);
+            char type;
+            line >> type;
+            if (type == 'v')
             {
-                  while (std::getline(ss, c, ' '))
-                  {
-                        // std::cout<<std::stof(c)<<";";
-                        vertices.push_back(std::stof(c));
-                        // if(std::stof(c) > 0) {
-                        //       std::cout<<"b";
-                        // }
-                  }
-                  // std::cout<<std::endl;
+                  float x, y, z;
+                  line >> x >> y >> z;
+                  vertices.push_back(x);
+                  vertices.push_back(y);
+                  vertices.push_back(z);
             }
-            else if (c == "f")
+            else if (type == 'f')
             {
-                  while (std::getline(ss, c, ' '))
-                  {
-                        indices.push_back(std::stoul(c)-1);
-                  }
+                  unsigned int a, b, c;
+                  line >> a >> b >> c;
+                  indices.push_back(a - 1);
+                  indices.push_back(b - 1);
+                  indices.push_back(c - 1);
             }
       }
       file.close();
-      std::cout<<vertices.size()/3<<":"<<indices.size()/3<<std::endl;
       this->CreateVBO(&vertices[0], vertices.size() * sizeof(float));
       this->AddVBAttrib(3, 3);
       this->CreateEBO(&indices[0], indices.size() * sizeof(unsigned int));
@@ -66,7 +65,6 @@ void Object::CreateVBO(float *vertices, GLsizeiptr size)
 void Object::AddVBAttrib(GLint size, GLint stride)
 {
       this->Bind();
-      glBindBuffer(GL_ARRAY_BUFFER, VBO);
       glVertexAttribPointer(vbRecId, size, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void *)(vbRecSz * sizeof(float)));
       glEnableVertexAttribArray(vbRecId);
       this->Unbind();
@@ -88,14 +86,33 @@ void Object::AttachShader(unsigned int shader)
       this->Bind();
       this->shader = shader;
       glUseProgram(shader);
+      transformPtr = glGetUniformLocation(this->shader, "transforms");
+      scalePtr = glGetUniformLocation(this->shader, "scales");
+      rotationPtr = glGetUniformLocation(this->shader, "rotation");
       this->Unbind();
 }
 
 void Object::Render()
 {
       this->Bind();
+      glUniform3f(scalePtr, scale.x, scale.y, scale.z);
+      glUniform3f(transformPtr, pos.x, pos.y, pos.z);
+      glUniform3f(rotationPtr, rotation.x, rotation.y, rotation.z);
       glDrawElements(GL_TRIANGLES, ebCount, GL_UNSIGNED_INT, 0);
       this->Unbind();
+}
+
+void Object::Rescale(vec3 scale)
+{
+      this->scale = scale;
+}
+void Object::Rotate(vec3 rotation)
+{
+      this->rotation = rotation;
+}
+void Object::Respawn(vec3 pos)
+{
+      this->pos = pos;
 }
 
 void Object::Bind()

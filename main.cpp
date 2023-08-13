@@ -13,6 +13,13 @@
 #include "lib/shader.h"
 
 float ratio;
+GLint ratioPtr;
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    ratio = float(height)/float(width);
+    glUniform1f(ratioPtr, ratio);
+}
 
 int main()
 {
@@ -67,27 +74,18 @@ int main()
       // o->AddVBAttrib(3, 6);
       // o->AddVBAttrib(3, 6);
       // o->CreateEBO(indices, sizeof(indices));
+      Object *o2 = new Object();
+      o2->Init("../teapot.obj");
 
       Pipeline builder;
       builder.AttachVertexShader("../shaders/vertex.vert");
       builder.AttachFragmentShader("../shaders/fragment.frag");
 
       o->AttachShader(builder.Build());
+      o2->AttachShader(o->GetShader());
       
-      GLint ratioPtr = glGetUniformLocation(o->GetShader(), "ratio");
+      ratioPtr = glGetUniformLocation(o->GetShader(), "ratio");
       glUniform1f(ratioPtr, ratio);
-
-      GLint scalePtr = glGetUniformLocation(o->GetShader(), "scales");
-      glm::vec3 scale = glm::vec3(0.1f,0.1f,0.1f);
-      glUniform3f(scalePtr, scale.x, scale.y, scale.z);
-      
-      GLint rotationPtr = glGetUniformLocation(o->GetShader(), "rotation");
-      glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f);
-      glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
-      
-      GLint transformPtr = glGetUniformLocation(o->GetShader(), "transforms");
-      glm::vec3 transform = glm::vec3(0.f,0.f,0.f);
-      glUniform3f(transformPtr, transform.x, transform.y, transform.z);
       
       GLint camPosPtr = glGetUniformLocation(o->GetShader(), "camPos");
       glm::vec3 camPos = glm::vec3(0.f, 0.5f, 1.f);
@@ -99,15 +97,21 @@ int main()
 
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_MULTISAMPLE);
+      glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
+      o->Rescale({0.1f,0.1f,0.1f});
+      o->Respawn({-0.5f,0,0});
+      o2->Rescale({0.1f,0.1f,0.1f});
+      o2->Respawn({0.5f,0,0});
+
+      float angY = 0;
 
       /* Loop until the user closes the window */
       while (!glfwWindowShouldClose(window))
       {
-            glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
-            rotation.y++;
-            // rotation.x++;
-            // rotation.z++;
-            camPos.x+=0.01f;
+            o->Rotate({0,angY,0});
+            o2->Rotate({0,angY,0});
+            angY+=0.01f;
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                   glfwSetWindowShouldClose(window, 1);
@@ -115,15 +119,17 @@ int main()
 
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             o->Render();
+            o2->Render();
 
             glfwSwapBuffers(window);
             glfwPollEvents();
       }
 
       delete o;
+      delete o2;
       builder.reset();
-      // delete o2;
       glDeleteProgram(o->GetShader());
       glfwTerminate();
       return 0;

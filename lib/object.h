@@ -3,6 +3,10 @@
 
 #include <GL/gl.h>
 
+struct vec3 {
+      float x,y,z;
+};
+
 class Object
 {
 private:
@@ -15,6 +19,13 @@ private:
       unsigned int ebCount;
 
       unsigned int shader;
+      GLint transformPtr;
+      GLint scalePtr;
+      GLint rotationPtr;
+
+      vec3 pos;
+      vec3 scale;
+      vec3 rotation;
 
 public:
       Object();
@@ -24,6 +35,9 @@ public:
       void CreateEBO(unsigned int *indices, GLsizeiptr size);
       void AttachShader(unsigned int shader);
       void Render();
+      void Rescale(vec3 scale);
+      void Rotate(vec3 rotation);
+      void Respawn(vec3 pos);
       void Bind();
       void Unbind();
 

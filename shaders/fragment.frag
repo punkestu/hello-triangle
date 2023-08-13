@@ -4,7 +4,7 @@ in vec3 fPos;
 out vec4 color;
 void main() { 
       vec3 lightDirection = vec3(
-            2,2,0
+            0,2,1
       );
       float intensity = clamp(dot(fPos, lightDirection),0.1,1);
       if(fColor == vec3(0)){

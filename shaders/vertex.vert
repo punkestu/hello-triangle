@@ -86,9 +86,9 @@ mat4 view() {
 mat4 projection() {
       float n = 1;
       float f = 2;
-      float e = 1/tan(radians(30/2));
+      float e = 1/tan(radians(45/2));
       return mat4(
-            -e*ratio, 0, 0, 0,
+            -e, 0, 0, 0,
             0, e, 0, 0,
             0, 0, (f+n)/(n-f), (2*f*n)/(n-f),
             0, 0, -1, 0
@@ -98,7 +98,7 @@ mat4 projection() {
 void main() {
       vec4 worldPos = vec4(vPos, 1.0) * scale() * rotate() * transform();
       vec4 projPos = projection()*(worldPos - vec4(camPos,0));
-      gl_Position = vec4(projPos.x,projPos.y, projPos.z, projPos.w)/projPos.w;
+      gl_Position = vec4(projPos.x*ratio,projPos.y, projPos.z, projPos.w)/projPos.w;
       fColor = vColor;
       // gl_Position = vec4(vPos.x*ratio,vPos.yz,1)*scale() *rotate() *transform();
       fPos = worldPos.xyz;
