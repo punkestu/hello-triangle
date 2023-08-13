@@ -35,15 +35,15 @@ int main()
 
       float vertices[] = {
           // =================================== front
-          -0.5f, -0.5f, 0.5f, 1.0, 1.0, 1.0,  // 0
-          0.5f, -0.5f, 0.5f, 1.0, 1.0, 1.0,   // 1
-          0.5f, 0.5f, 0.5f, 1.0, 1.0, 1.0,    // 2
-          -0.5f, 0.5f, 0.5f, 1.0, 1.0, 1.0,   // 3
+          -0.5f, -0.5f, 0.5f, 1.0, 0.0, 0.0,  // 0
+          0.5f, -0.5f, 0.5f, 0.0, 1.0, 0.0,   // 1
+          0.5f, 0.5f, 0.5f, 0.0, 0.0, 1.0,    // 2
+          -0.5f, 0.5f, 0.5f, 1.0, 1.0, 0.0,   // 3
                                               // back
-          -0.5f, -0.5f, -0.5f, 1.0, 1.0, 1.0, // 0
-          0.5f, -0.5f, -0.5f, 1.0, 1.0, 1.0,  // 1
+          -0.5f, -0.5f, -0.5f, 0.0, 1.0, 1.0, // 0
+          0.5f, -0.5f, -0.5f, 1.0, 0.0, 1.0,  // 1
           0.5f, 0.5f, -0.5f, 1.0, 1.0, 1.0,   // 2
-          -0.5f, 0.5f, -0.5f, 1.0, 1.0, 1.0,  // 3
+          -0.5f, 0.5f, -0.5f, 0.0, 0.0, 0.0,  // 3
       };
 
       unsigned int indices[] = {
@@ -62,10 +62,11 @@ int main()
       };
 
       Object *o = new Object();
-      o->CreateVBO(vertices, sizeof(vertices));
-      o->AddVBAttrib(3, 6);
-      o->AddVBAttrib(3, 6);
-      o->CreateEBO(indices, sizeof(indices));
+      o->Init("../teapot.obj");
+      // o->CreateVBO(vertices, sizeof(vertices));
+      // o->AddVBAttrib(3, 6);
+      // o->AddVBAttrib(3, 6);
+      // o->CreateEBO(indices, sizeof(indices));
 
       Pipeline builder;
       builder.AttachVertexShader("../shaders/vertex.vert");
@@ -77,7 +78,7 @@ int main()
       glUniform1f(ratioPtr, ratio);
 
       GLint scalePtr = glGetUniformLocation(o->GetShader(), "scales");
-      glm::vec3 scale = glm::vec3(0.5f,0.5f,0.5f);
+      glm::vec3 scale = glm::vec3(0.1f,0.1f,0.1f);
       glUniform3f(scalePtr, scale.x, scale.y, scale.z);
       
       GLint rotationPtr = glGetUniformLocation(o->GetShader(), "rotation");
@@ -88,9 +89,13 @@ int main()
       glm::vec3 transform = glm::vec3(0.f,0.f,0.f);
       glUniform3f(transformPtr, transform.x, transform.y, transform.z);
       
-      GLint cameraPtr = glGetUniformLocation(o->GetShader(), "camera");
-      glm::vec3 pos = glm::vec3(0.f, 0.f, -1.f);
-      glUniform3f(cameraPtr, pos.x, pos.y, pos.z);
+      GLint camPosPtr = glGetUniformLocation(o->GetShader(), "camPos");
+      glm::vec3 camPos = glm::vec3(0.f, 0.5f, 1.f);
+      glUniform3f(camPosPtr, camPos.x, camPos.y, camPos.z);
+
+      GLint camDirPtr = glGetUniformLocation(o->GetShader(), "camDir");
+      glm::vec3 camDir = glm::vec3(0.f, 0.f, 0.f);
+      glUniform3f(camDirPtr, camDir.x, camDir.y, camDir.z);
 
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_MULTISAMPLE);
@@ -98,12 +103,11 @@ int main()
       /* Loop until the user closes the window */
       while (!glfwWindowShouldClose(window))
       {
-            // glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
-            // rotation.y++;
-            // glUniform3f(transformPtr, transform.x, transform.y, transform.z);
-            // transform.x+=0f;
-            glUniform3f(cameraPtr, pos.x, pos.y, pos.z);
-            pos.x -= 0.01f;
+            glUniform3f(rotationPtr, glm::radians(rotation.x), glm::radians(rotation.y), glm::radians(rotation.z));
+            rotation.y++;
+            // rotation.x++;
+            // rotation.z++;
+            camPos.x+=0.01f;
             if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             {
                   glfwSetWindowShouldClose(window, 1);

@@ -18,6 +18,7 @@ private:
 
 public:
       Object();
+      void Init(const char* objPath);
       void CreateVBO(float *vertices, GLsizeiptr size);
       void AddVBAttrib(GLint size, GLint stride);
       void CreateEBO(unsigned int *indices, GLsizeiptr size);
